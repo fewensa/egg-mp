@@ -9,6 +9,7 @@ const msgSecCheck = 'https://api.weixin.qq.com/wxa/msg_sec_check'; // 微信敏�
 const sendMsgUri =
   'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send'; // 微信服务通知
 const payUri = 'https://api.mch.weixin.qq.com/pay/unifiedorder'; // 微信统一下单
+const orderQueryUri = 'https://api.mch.weixin.qq.com/pay/orderquery'; // 订单查询
 
 class MPService extends Service {
 
@@ -149,6 +150,36 @@ class MPService extends Service {
       };
     }
     return this._secondSignOrder(json);
+  }
+
+  /**
+  * 订单查询
+  * @param {Object} data 推送消息
+  * @return {Object} 用于小程序发起支付
+  * @see https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_2
+  */
+  async orderQuery(data) {
+    const {
+      app,
+      ctx,
+      service,
+    } = this;
+    const {
+      appId,
+      mchId,
+    } = app.config.mp;
+    const params = {
+      ...data,
+      appid: appId,
+      mch_id: mchId,
+      nonce_str: service.sign.createNonceStr(),
+    };
+    params.sign = service.sign.md5(params);
+    const successXml = await ctx.curl(orderQueryUri, {
+      method: 'POST',
+      data: ctx.helper.json2xml(params),
+    });
+    return ctx.helper.xml2json(successXml.data);
   }
 
   // 第一次签名
