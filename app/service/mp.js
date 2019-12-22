@@ -176,7 +176,10 @@ class MPService extends Service {
       nonce_str: service.sign.createNonceStr(),
     };
     const rawsign = service.sign.raw(params);
-    params.sign = service.sign.md5(rawsign + '&key=' + apiKey);
+    const rawsign_with_key = rawsign + '&key=' + apiKey;
+    params.sign = service.sign.md5(rawsign_with_key);
+    console.log(rawsign_with_key);
+    console.log(params);
     const successXml = await ctx.curl(orderQueryUri, {
       method: 'POST',
       data: ctx.helper.json2xml(params),
