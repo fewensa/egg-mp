@@ -167,6 +167,7 @@ class MPService extends Service {
     const {
       appId,
       mchId,
+      apiKey,
     } = app.config.mp;
     const params = {
       ...data,
@@ -174,7 +175,8 @@ class MPService extends Service {
       mch_id: mchId,
       nonce_str: service.sign.createNonceStr(),
     };
-    params.sign = service.sign.md5(params);
+    const rawsign = service.sign.raw(params);
+    params.sign = service.sign.md5(rawsign + '&key=' + apiKey);
     const successXml = await ctx.curl(orderQueryUri, {
       method: 'POST',
       data: ctx.helper.json2xml(params),
