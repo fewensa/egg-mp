@@ -178,8 +178,6 @@ class MPService extends Service {
     const rawsign = service.sign.raw(params);
     const rawsign_with_key = rawsign + '&key=' + apiKey;
     params.sign = service.sign.md5(rawsign_with_key);
-    console.log(rawsign_with_key);
-    console.log(params);
     const successXml = await ctx.curl(orderQueryUri, {
       method: 'POST',
       data: ctx.helper.json2xml(params),
